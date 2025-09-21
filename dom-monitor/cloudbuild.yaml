@@ -1,0 +1,34 @@
+options:
+  logging: CLOUD_LOGGING_ONLY # 無効エラー回避のためログバケット設定を省略
+
+steps:
+  # 1. Secret Managerから環境変数を取得
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    id: 'fetch-secrets'
+    args:
+      - '-c'
+      - |
+        # シークレットを取得して環境変数ファイルに保存
+        echo "export SLACK_WEBHOOK_URL=$(gcloud secrets versions access latest --secret=monitoring-animate-slack-webhook-url-v2)" >> /workspace/env-vars
+        echo "export MONITORING_TARGET_URL=$(gcloud secrets versions access latest --secret=monitoring-animate-target-url-v2)" >> /workspace/env-vars
+        echo "export CATEGORY_PATH=$(gcloud secrets versions access latest --secret=monitoring-animate-category-path-v2)" >> /workspace/env-vars
+        echo "export CATEGORY_ID=$(gcloud secrets versions access latest --secret=monitoring-animate-category-id-v2)" >> /workspace/env-vars
+
+  # 2. Playwrightが依存するブラウザをインストール
+  - name: 'mcr.microsoft.com/playwright:v1.51.1-jammy'
+    id: playwright-install-and-run
+    entrypoint: bash
+    env:
+      - NODE_ENV=production
+    args:
+      - -c
+      - |
+        # 環境変数を読み込む
+        source /workspace/env-vars
+
+        corepack enable
+        corepack prepare pnpm@latest --activate
+        pnpm install --frozen-lockfile --prod
+        pnpm exec playwright install
+        node src/index.mjs
