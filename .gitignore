@@ -1,0 +1,43 @@
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Envs
+.env
+**/*.env
+.env.production
+.env.local
+
+# WordPress Plugin
+automatic-updater/data/
+automatic-updater/*.log
+automatic-updater/backups/
+automatic-updater/docs/
+automatic-updater/.env
+automatic-updater/.claude/
+
+# Node.js
+dom-monitor/node_modules/
+dom-monitor/.env
+dom-monitor/*.log
+dom-monitor/dist/
+
+# Development
+backups/
+*.backup.*
+*.tmp
+
+# symlink
+symlink/
+
+# Documents
+**/docs/archive/**
+
+# AI
+.ai/
